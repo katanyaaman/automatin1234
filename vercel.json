@@ -1,0 +1,18 @@
+{
+  "name": "automatin1234",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/webhook",
+      "destination": "/api/webhook.py"
+    }
+  ],
+  "version": 2,
+  "outputDirectory": "build",
+  "builds": [
+    {
+      "src": "api/webhook.py",
+      "use": "@vercel/python"
+    }
+  ]
+}

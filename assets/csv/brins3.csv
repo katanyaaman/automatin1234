@@ -1,0 +1,2 @@
+id,parent_id,intent_name,respond,Evidence,sample_text1,sample_text2,sample_text3,sample_text4
+intvsop40ctszgj4om,root,usr.products_for_insurance,"Iya, Brins memiliki produk untuk asuransi harta benda dan rumah tinggal yang bernama BRINS ASRI",,apakah BRINS menyediakan produk untuk asuransi harta benda ?,di BRINS ada produk untuk ansurasi ga?, di BRINS ada produk untuk ansurasi gasih?, di BRINS  itu ada produk untuk ansurasi ga?

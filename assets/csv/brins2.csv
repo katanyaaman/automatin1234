@@ -1,0 +1,6 @@
+id,parent_id,intent_name,respond,Evidence,sample_text1,sample_text2
+intvsop40ctszgj4om,root,usr.products_for_insurance,"Iya, Brins memiliki produk untuk asuransi harta benda dan rumah tinggal yang bernama BRINS ASRI",,apakah BRINS menyediakan produk untuk asuransi harta benda ?,di BRINS ada produk untuk ansurasi ga?
+int4054tkolz6cphkh,root,usr.guaranteed_risk_brins_beautiful,"Risiko yang di jamin dalam BRINS ASRI adalah kebakaran dan perluasannya, rumah tinggal, tanggung jawab terhadap tertanggung dan tanggung jawab terhadap pihak ketiga.",,Apakah kecelakaan termasuk risiko yang dapat dijamin BRINS ASRI?,ada apa saja resiko yang bisa dijamin?
+intz9a6r85bd1jcb43,root,usr.beautiful_brins_package,"Iya, pada  BRINS ASRI terdapat 3 pilihan paket bagi tertanggung \/ konsumen seperti : Paket Silver, Paket Gold dan Paket Platinum","wording harus nya ""... tertanggung / konsumen ...""
+tapi di v2 "" ... tertanggung konsumen ...""",apa ada pilihan paket untuk brins asri?,adakah pilihan paket di brins untuk konsumen?
+intjn6ie9boa1xamgv,root,usr.brins_vehicle_insurance,Brins memiliki produk untuk asuransi kendaraan bermotor yang bernama BRINS OTO,,ada ga sih asuransi kendaraan di brins,apakah brins menyediakan produk asuransi kendaraan

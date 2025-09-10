@@ -1,0 +1,123 @@
+name: Python Selenium CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Pilih platform pengujian'
+        required: true
+        default: 'webchat'
+        type: choice
+        options:
+        - webchat
+        - telegram
+        - instagram
+      filename:
+        description: 'Nama file CSV atau Excel yang akan diuji'
+        required: true
+        default: 'kb_asuransi_10.csv'
+      tester_name:
+        description: 'Nama Tester'
+        required: false
+        default: 'Nama Penguji Baru'
+      greeting:
+        description: 'Sapaan awal untuk webchat atau telegram'
+        required: false
+        default: 'Halo'
+      url:
+        description: 'URL Webchat Target (hanya jika platform adalah webchat)'
+        required: false
+        default: ''
+      target_bot_username:
+        description: 'Username Bot Telegram Target (hanya jika platform adalah telegram)'
+        required: false
+        default: ''
+      target_ig_username:
+        description: 'Username Instagram Target (hanya jika platform adalah instagram)'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      API_ID: ${{ secrets.API_ID }}
+      API_HASH: ${{ secrets.API_HASH }}
+      TELEGRAM_SESSION: ${{ secrets.TELEGRAM_SESSION }}
+
+      INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
+      INSTAGRAM_PASSWORD: ${{ secrets.INSTAGRAM_PASSWORD }}
+      INSTAGRAM_2FA_CODE: ${{ secrets.INSTAGRAM_2FA_CODE }}
+
+      PLATFORM: ${{ github.event.inputs.platform }}
+      TARGET_BOT_USERNAME: ${{ github.event.inputs.target_bot_username }}
+      TARGET_URL: ${{ github.event.inputs.url }}
+      FILENAME: ${{ github.event.inputs.filename }}
+      TESTER_NAME: ${{ github.event.inputs.tester_name }}
+      GREETING: ${{ github.event.inputs.greeting }}
+      TARGET_USERNAME: ${{ github.event.inputs.target_ig_username }}
+
+      API_KEY_OPENROUTER: ${{ secrets.API_KEY_OPENROUTER }}
+      API_KEY_GEMINI: ${{ secrets.API_KEY_GEMINI }}
+
+    strategy:
+      matrix:
+        python-version: ['3.10']
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3-dev
+
+      - name: Download Previous Instagram Session
+        uses: actions/download-artifact@v4
+        with:
+          name: instagram-session
+          path: .
+        continue-on-error: true
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Tests
+        run: |
+          python main.py
+
+      - name: Upload Current Instagram Session
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instagram-session
+          path: session.json
+          retention-days: 5
+
+      - name: Remove Folder Template
+        run: rm -rf report/template
+
+      - name: Upload All Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: report/
+
+      - name: Debugging Information
+        run: |
+          echo "Python version: $(python --version)"
+          echo "Installed packages: $(pip freeze)"
+          echo "Target Platform: ${{ env.PLATFORM }}"
+          echo "Filename: ${{ env.FILENAME }}"
+          echo "Tester Name: ${{ env.TESTER_NAME }}"
