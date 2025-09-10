@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Ganti dengan VERIFY_TOKEN Anda dari pengaturan webhook Meta
 VERIFY_TOKEN = os.getenv('FB_VERIFY_TOKEN', 'kmzwa8awaa')
 
-@app.route('/webhook', methods=['GET'])
+@app.route('/api/webhook', methods=['GET'])
 def verify():
     print("Verify function called.")
     mode = request.args.get('hub.mode')
@@ -30,7 +30,7 @@ def verify():
             print(f"Reason: Token mismatch. Expected '{VERIFY_TOKEN}', but got '{token}'.")
         return 'Verification failed', 403
 
-@app.route('/webhook', methods=['POST'])
+@app.route('/api/webhook', methods=['POST'])
 def webhook():
     print("Webhook POST function called.")
     data = request.get_json()
