@@ -23,7 +23,11 @@ def verify():
         print('Webhook verified successfully.')
         return challenge, 200
     else:
-        print('Verification failed: Token mismatch or invalid mode.')
+        print('Verification failed.')
+        if mode != 'subscribe':
+            print(f"Reason: Invalid mode. Expected 'subscribe', but got '{mode}'.")
+        if token != VERIFY_TOKEN:
+            print(f"Reason: Token mismatch. Expected '{VERIFY_TOKEN}', but got '{token}'.")
         return 'Verification failed', 403
 
 @app.route('/webhook', methods=['POST'])
