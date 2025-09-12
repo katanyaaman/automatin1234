@@ -1,2 +1,9 @@
-Flask
-requests
+instagrapi
+telethon
+art
+selenium
+colorama
+pandas
+openpyxl
+webdriver-manager
+jinja2

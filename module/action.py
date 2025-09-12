@@ -1,7 +1,7 @@
 # module/action.py
 import time
 import asyncio
-from module import modul, envwebchat, envstatus, envfile, envreport, envfolder, envtelegram, envinstagram, envhitllm
+from module import modul, envwebchat, envstatus, envfile, envreport, envfolder, envtelegram, envinstagram, envllmscore
 from module.modul import log_function_status
 
 
@@ -43,7 +43,7 @@ def actions_webchat(driver, json_data, report_filename, id_test, time_start, tod
                 end_duration_persampletext = modul.end_time(duration_perquestion)
                 
                 # Mengaktifkan evaluasi LLM
-                skor, _, explanation, AI = envhitllm.hit_llm_to_scoring_gemini(respond_bot, respond_csv)
+                skor, _, explanation, AI = envllmscore.llm_score(respond_bot, respond_csv)
                 
                 status = envstatus.status(skor)
                 data_bot = {
@@ -113,7 +113,7 @@ async def actions_telegram(target_bot_username, greeting, json_data, report_file
                 end_duration_persampletext = modul.end_time(duration_perquestion)
                 
                 # Mengaktifkan evaluasi LLM
-                skor, _, explanation, AI = envhitllm.hit_llm_to_scoring_gemini(respond_bot, respond_csv)
+                skor, _, explanation, AI = envllmscore.llm_score(respond_bot, respond_csv)
                 
                 status = envstatus.status(skor)
                 image_capture = None
@@ -153,121 +153,6 @@ async def actions_telegram(target_bot_username, greeting, json_data, report_file
         print(f"\n竢ｳ Total durasi Topik '{element.get('title', 'Untitled')}' : {end_duration_pertitle}\n")
     print("識 Topik Terakhir \n")
     # modul.close_browser(driver)
-
-@log_function_status
-async def actions_facebook(target_username, greeting, json_data, report_filename, id_test, time_start, today, tester_name):
-    try:
-        modul.show_loading(f"Initializing Facebook API and session...")
-        fb_client = envfacebook.FacebookClient()
-
-        if not fb_client.access_token:
-            error_msg = "Facebook access token failed to load. Check environment variables and token file."
-            print(error_msg)
-            envstatus.log_error(f"Facebook Error: {error_msg}", tester_name, id_test)
-            return
-        envstatus.log_status("Facebook client initialized successfully.", tester_name, id_test, status="success")
-    except Exception as e:
-        error_msg = f"Failed to initialize Facebook client: {str(e)}"
-        print(error_msg)
-        envstatus.log_error(f"Facebook Initialization Error: {error_msg}", tester_name, id_test)
-        return
-
-    modul.show_loading(f"Mengirim sapaan awal ke {target_username}...")
-    fb_client.send_message(target_username, greeting)
-    await asyncio.sleep(5) # Give time for the greeting to be processed
-    print("\n")
-
-    title = f"当 Membaca pertanyaan dan mengirim ke {target_username}"
-    modul.show_loading(title)
-    print("\n")
-
-    count_per_element_title = len(json_data)
-    question_count = sum(sum(1 for key in item if key.startswith("pertanyaan")) for item in json_data)
-
-    for element in json_data:
-        duration_pertitle = modul.start_time()
-        modul.show_loading(element.get("title", "Untitled"))
-        print("\n")
-
-        for key, value in element.items():
-            if key.startswith("pertanyaan") and value is not None and str(value).strip() != "":
-                duration_perquestion = modul.start_time()
-                question = str(value)
-
-                try:
-                    fb_client.send_message(target_username, question)
-                    await asyncio.sleep(15) # Wait for response
-                    
-                    respond_bot_obj = fb_client.get_latest_message()
-                    respond_bot = respond_bot_obj["message_text"] if respond_bot_obj else "Error: No response from bot after waiting."
-                    
-                    # Log successful message delivery
-                    envstatus.log_status(
-                        f"Message sent to {target_username}",
-                        tester_name,
-                        id_test,
-                        status="success",
-                        additional_info={"question": question, "response": respond_bot}
-                    )
-                except Exception as e:
-                    error_msg = f"Failed to send/receive message: {str(e)}"
-                    print(error_msg)
-                    envstatus.log_error(
-                        f"Facebook Message Error: {error_msg}",
-                        tester_name,
-                        id_test,
-                        additional_info={"question": question}
-                    )
-                    respond_bot = error_msg
-
-                title_loading = f"{key} : {question}"
-                modul.show_loading_sampletext(title_loading)
-                respond_csv = str(element.get("context", "")).strip()
-                respond_csv = envstatus.respond_csv_correction(respond_csv)
-                end_duration_persampletext = modul.end_time(duration_perquestion)
-                
-                # Mengaktifkan evaluasi LLM
-                skor, _, explanation, AI = envllmscore.llm_score(respond_bot, respond_csv)
-                
-                status = envstatus.status(skor)
-                image_capture = None # No screenshot for Facebook Messenger via Graph API
-                data_bot = {
-                    "no": element.get("no", ""),
-                    "title": element.get("title", ""),
-                    "question": question,
-                    "response_kb": respond_csv,
-                    "response_llm": respond_bot,
-                    "status": status,
-                    "duration": end_duration_persampletext,
-                    "image_capture": image_capture,
-                    "skor": skor,
-                    "explanation": explanation
-                }
-                envfile.write_json_data_bot(data_bot, report_filename, id_test)
-                pass_count, failed_count = envstatus.calculate(report_filename, id_test)
-                data_summary = {
-                    "id_test": id_test,
-                    "tester_name": tester_name,
-                    "ai_evaluation": AI,
-                    "url": f"Facebook Messenger ({target_username})",
-                    "page_name": "Facebook Test",
-                    "browser_name": "Graph API",
-                    "date_test": today,
-                    "start_time_test": time_start,
-                    "total_title": count_per_element_title,
-                    "total_question": question_count,
-                    "success": pass_count,
-                    "failed": failed_count
-                }
-                envfile.write_json_data_summary(data_summary, report_filename, id_test)
-                envreport.report_action(report_filename, id_test)
-        end_duration_pertitle = modul.end_time(duration_pertitle)
-        chart = {element.get("title", "Untitled"): end_duration_pertitle}
-        envfile.write_json_chart(chart, report_filename, id_test)
-        print(f"\n竢ｳ Total durasi Topik '{element.get('title', 'Untitled')}' : {end_duration_pertitle}\n")
-    print("識 Topik Terakhir \n")
-    # No logout needed for Graph API
-
 
 @log_function_status
 async def actions_instagram(target_username, greeting, json_data, report_filename, id_test, time_start, today, tester_name):

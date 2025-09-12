@@ -11,24 +11,10 @@ from module import modul
 from colorama import Fore, Style
 import sys
 
-def wait_time(seconds=1):
-    """Pause execution for the specified number of seconds.
-    
-    Args:
-        seconds (int): Number of seconds to wait. Defaults to 1.
-    """
-    time.sleep(seconds)
+def wait_time(numbres=1):
+    time.sleep(numbres)
 
 def prechat_form(driver, greeting, name, email, phone):
-    """Fill out the pre-chat form if available, otherwise send greeting message.
-    
-    Args:
-        driver: Selenium WebDriver instance
-        greeting (str): Initial greeting message
-        name (str): User's name for the form
-        email (str): User's email for the form
-        phone (str): User's phone number for the form
-    """
     title = "Checking for available webchat pre-chat form"
     modul.show_loading(title)
 
@@ -77,17 +63,6 @@ def prechat_form(driver, greeting, name, email, phone):
 
 
 def wait_reply(driver, class_name="message-content-wrapper", content="content", msgs="hello"):
-    """Wait for a reply in the chat window.
-    
-    Args:
-        driver: Selenium WebDriver instance
-        class_name (str): Class name for message wrapper element
-        content (str): Class name for content element
-        msgs (str): Message to wait for response to
-        
-    Note:
-        Times out after 120 seconds of waiting.
-    """
     send_msgs = msgs
     stoper = True
     start_time = time.time()
@@ -135,74 +110,94 @@ def wait_reply(driver, class_name="message-content-wrapper", content="content", 
             stoper = False
     
 def send_message(driver, question):
-    """Send a message in the chat window.
-    
-    Args:
-        driver: Selenium WebDriver instance
-        question (str): Message text to send
-    """
+    # mencari text input kemudian mengisi sample text
     try:
         input_message = driver.find_element(By.ID, "input-message")
         input_message.send_keys(question)
-    except Exception as e:
-        print(f"Error finding input field: {e}")
-        return
-        
+    except:
+        pass
+    # mengirim sample text
     try:
         button_send = driver.find_element(By.ID, "button-send")
         wait_time()
         button_send.click()
-    except Exception as e:
-        print(f"Error clicking send button: {e}")
+    except:
+        pass
 
 def get_reply_chat(driver, class_name="message-content-wrapper", content="content", messages="hai", message_content="message-content"):
-    """Get the reply messages from the chat window.
-    
-    Args:
-        driver: Selenium WebDriver instance
-        class_name (str): Class name for message wrapper element
-        content (str): Class name for content element
-        messages (str): Original message to find response to
-        message_content (str): Class name for message content element
-        
-    Returns:
-        list: List of reply message texts
-    """
     message = messages
     reply = []
-
-    def extract_messages(elements):
-        """Helper function to extract message texts from elements."""
-        messages = []
-        for element in elements:
-            time.sleep(0.3)
-            messages.append(element.text)
-        return messages
-
     try:
-        # Check for single response
-        messages_elements = driver.find_elements(By.CLASS_NAME, class_name)
-        if len(messages_elements) >= 2:
-            second_last = messages_elements[-2].find_element(By.CLASS_NAME, content).text
-            if second_last.lower().strip() == message.lower().strip():
-                last_message = messages_elements[-1]
-                content_elements = last_message.find_elements(By.CLASS_NAME, message_content)
-                print(f"Jumlah bubble: {len(content_elements)} bubble")
-                reply.extend(extract_messages(content_elements))
-
-        # Check for double response
-        if len(messages_elements) >= 3:
-            third_last = messages_elements[-3].find_element(By.CLASS_NAME, content).text
-            if third_last.lower().strip() == message.lower().strip():
-                for i in range(-2, 0):
-                    content_elements = messages_elements[i].find_elements(By.CLASS_NAME, message_content)
-                    print(f"Jumlah bubble: {len(content_elements)} bubble")
-                    reply.extend(extract_messages(content_elements))
-
-    except Exception as e:
-        print(f"Error getting reply messages: {e}")
-
-    return reply
+        len_last_second = driver.find_elements(By.CLASS_NAME, class_name)[-2]
+        elem_last_second = len_last_second.find_element(By.CLASS_NAME, content)
+        elem_second_text = elem_last_second.text
+        # jika elemen kedua terakhir sama dengan text yang dikirim
+        if elem_second_text.lower().strip() == message.lower().strip():
+            # jika balasan chat hanya ada satu pesan
+            try:
+                first_text = driver.find_elements(By.CLASS_NAME, class_name)[-1]
+                elem_first_text = first_text.find_elements(By.CLASS_NAME, message_content)
+                len_msg_content = len(elem_first_text)
+                print("Jumlah bubble:", len_msg_content, "bubble")
+                # reply = []
+                for i, val in enumerate(elem_first_text):
+                    time.sleep(0.3)
+                    # driver.implicitly_wait(30)
+                    text_list = val.text
+                    reply.append(text_list)
+                    # log
+                    # print("text_data {} :".format(i), text_list)
+                # log
+                # print(reply)
+                # get_reply = "\n".join(reply)
+                # print("Balasan Chat hanya satu:\n---\n",
+                #       get_reply.strip(), "\n---")
+                # print("+Balasan Chat 1 pesan+")
+            except IndexError:
+                print("excep handling response.py file")
+                pass
+        else:
+            pass
+    except:
+        pass
+    # jika balasan chat ada 2 response
+    try:
+        len_last_third = driver.find_elements(By.CLASS_NAME, class_name)[-3]
+        elem_last_third = len_last_third.find_element(By.CLASS_NAME, content)
+        elem_last_third = elem_last_third.text
+        # jika elemen ketiga terakhir sama dengan text yang dikirim
+        if elem_last_third.lower().strip() == message.lower().strip():
+            try:
+                # reply = []
+                loop = -2  # -2,-1 < 0
+                while loop < 0:
+                    try:
+                        time.sleep(2)
+                        first_text = driver.find_elements(By.CLASS_NAME, class_name)[loop]
+                        elem_first_text = first_text.find_elements(By.CLASS_NAME, message_content)
+                        # log
+                        len_msg_content = len(elem_first_text)
+                        print("Jumlah bubble:", len_msg_content, "bubble")
+                        for i, val in enumerate(elem_first_text):
+                            time.sleep(0.5)
+                            text_list = val.text
+                            reply.append(text_list)
+                            # log
+                            # print("text_data {} :".format(i), text_list)
+                        loop += 1
+                        # jika 0 < 0 = Flase [stop]
+                    except:
+                        pass
+                # log
+                # print(reply)
+                # get_reply = "\n".join(reply)
+                # print("Balasan Chat Ada 2:\n---\n",
+                #       get_reply.strip(), "\n---")
+                # print("+Balasan Chat 2 pesan+")
+            except:
+                pass
+        else:
+            pass
     except:
         pass
     # jika balasan chat ada 3 response

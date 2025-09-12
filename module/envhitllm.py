@@ -100,7 +100,8 @@ def hit_llm_to_scoring_gemini(response_bot, respond_text):
         actual_output=response_bot
     )
     
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=" + api_key_gemini
+    # url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=" + api_key_gemini
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=AIzaSyB_kYDKaUbfr1T6VXsaraI-CkS2Go5gV14"
     headers = {
         "Content-Type": "application/json"
     }
@@ -163,3 +164,7 @@ def hit_llm_to_scoring_gemini(response_bot, respond_text):
     # print("Explanation:", explanation)
 
     return score, output, explanation, AI
+
+# response_bot = "Jenis asuransi ini memberikan perlindungan finansial terhadap risiko kehidupan dan kematian pemegang polis. Karakteristik utama asuransi jiwa adalah pemberian manfaat berupa uang pertanggungan kepada ahli waris jika pemegang polis berpulang. Apabila pemegang polis masih hidup dalam jangka waktu yang ditentukan, mereka akan mendapatkan manfaat dalam bentuk nilai tunai.Manfaat dan perlindungan yang diberikan asuransi jiwa berupa uang pertanggungan yang bisa digunakan untuk memenuhi kebutuhan sehari-hari.	"
+# respond_text = "testinng"
+# hit_llm_to_scoring_gemini(response_bot, respond_text)

@@ -131,18 +131,8 @@ def main():
                 )
             finally:
                 loop.close()
-
-        elif platform == 'facebook':
-            target_username = os.getenv('TARGET_USERNAME')
-            if not target_username:
-                print("Error: TARGET_USERNAME tidak diatur untuk platform 'facebook'.")
-                modul.test_done("Test Failed!")
-                return
-            print(f"Target User Facebook: {target_username}\n")
-            from module import envfacebook
-            action.actions_facebook(target_username, greeting, json_data, report_filename, id_test, time_start, today, tester_name)
         else:
-            print(f"Error: Platform '{platform}' tidak didukung. Harap gunakan 'webchat', 'telegram', 'instagram', atau 'facebook'.")
+            print(f"Error: Platform '{platform}' tidak didukung. Harap gunakan 'webchat', 'telegram', atau 'instagram'.")
             modul.test_done("Test Failed!")
             return
 

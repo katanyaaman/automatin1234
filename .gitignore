@@ -1,1 +1,7 @@
-s
+# .gitignore
+# Mencegah pengunggahan file sesi instagrapi
+# kakiwuaka.json # Ganti dengan username Instagram Anda yang sebenarnya
+
+# Ignore instagrapi session files and folder
+session/
+session.json
