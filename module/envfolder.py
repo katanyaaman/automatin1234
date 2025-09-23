@@ -6,7 +6,7 @@ def json_converted(json_file):
 
     # Membuat path lengkap untuk folder
     folder_path = f'assets/json/converted/{tanggal_hari_ini}'
-    result_path = f'{folder_path}/{os.path.basename(json_file)}.json'
+    result_path = f'{folder_path}/{json_file}.json'
 
     # Membuat folder jika belum ada
     if not os.path.exists(folder_path):

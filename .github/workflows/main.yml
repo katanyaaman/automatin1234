@@ -15,6 +15,7 @@ on:
         - webchat
         - telegram
         - instagram
+        - facebook
       filename:
         description: 'Nama file CSV atau Excel yang akan diuji'
         required: true
@@ -39,6 +40,10 @@ on:
         description: 'Username Instagram Target (hanya jika platform adalah instagram)'
         required: false
         default: ''
+      target_fanpage_id:
+        description: 'ID Fanpage Facebook Target (hanya jika platform adalah facebook)'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -60,6 +65,7 @@ jobs:
       TESTER_NAME: ${{ github.event.inputs.tester_name }}
       GREETING: ${{ github.event.inputs.greeting }}
       TARGET_USERNAME: ${{ github.event.inputs.target_ig_username }}
+      TARGET_FANPAGE_ID: ${{ github.event.inputs.target_fanpage_id }}
 
       API_KEY_OPENROUTER: ${{ secrets.API_KEY_OPENROUTER }}
       API_KEY_GEMINI: ${{ secrets.API_KEY_GEMINI }}
