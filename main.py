@@ -131,8 +131,25 @@ def main():
                 )
             finally:
                 loop.close()
+
+        elif platform == 'facebook':
+            target_fanpage_id = os.getenv('TARGET_FANPAGE_ID')
+            if not target_fanpage_id:
+                print("Error: TARGET_FANPAGE_ID tidak diatur untuk platform 'facebook'.")
+                modul.test_done("Test Failed!")
+                return
+            print(f"Target Fanpage ID: {target_fanpage_id}\n")
+            # Menjalankan fungsi async dalam event loop baru
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                loop.run_until_complete(
+                    action.actions_facebook(target_fanpage_id, greeting, json_data, report_filename, id_test, time_start, today, tester_name)
+                )
+            finally:
+                loop.close()
         else:
-            print(f"Error: Platform '{platform}' tidak didukung. Harap gunakan 'webchat', 'telegram', atau 'instagram'.")
+            print(f"Error: Platform '{platform}' tidak didukung. Harap gunakan 'webchat', 'telegram', 'instagram', atau 'facebook'.")
             modul.test_done("Test Failed!")
             return
 

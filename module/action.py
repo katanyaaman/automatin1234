@@ -1,8 +1,11 @@
 # module/action.py
 import time
 import asyncio
-from module import modul, envwebchat, envstatus, envfile, envreport, envfolder, envtelegram, envinstagram, envllmscore
+from module import modul, envwebchat, envstatus, envfile, envreport, envfolder, envtelegram, envinstagram, envllmscore, envfacebook
 from module.modul import log_function_status
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from typing import Optional
 
 
 @log_function_status
@@ -246,3 +249,136 @@ async def actions_instagram(target_username, greeting, json_data, report_filenam
         print(f"\n竢ｳ Total durasi Topik '{element.get('title', 'Untitled')}' : {end_duration_pertitle}\n")
 
     print("識 Topik Terakhir \n")
+
+@log_function_status
+async def actions_facebook(target_fanpage_id, greeting, json_data, report_filename, id_test, time_start, today, tester_name):
+    from session_manager import get_latest_session, validate_session_cookies, create_session_folder
+    import os
+
+    logger = envfacebook.logger
+
+    def setup_test_environment() -> tuple[str, str]:
+        """Set up the test environment and handle login."""
+        logger.info("Setting up test environment...")
+
+        try:
+            # Check for existing valid session
+            latest_session = get_latest_session()
+            if latest_session:
+                session_id, session_folder = latest_session
+                cookie_file = os.path.join(session_folder, 'cookies.json')
+                if validate_session_cookies(cookie_file):
+                    logger.info(f"Using existing valid session: {session_id} in {session_folder}")
+                    return session_folder, session_id
+
+            # If no valid session, perform manual login
+            session_folder, session_id = envfacebook.perform_manual_login()
+            logger.info(f"New session established: {session_id} in {session_folder}")
+            return session_folder, session_id
+        except Exception as e:
+            logger.error(f"Failed to establish session: {e}")
+            raise
+
+    logger.info("Starting Facebook chatbot automation testing...")
+
+    # Initialize variables
+    session_folder: Optional[str] = None
+    session_id: Optional[str] = None
+    driver = None
+
+    try:
+        # 1. Set up session and login
+        session_folder, session_id = setup_test_environment()
+
+        # 2. Initialize driver and navigate to chatbot
+        logger.info("Initializing WebDriver...")
+        driver = envfacebook.initialize_driver(session_folder)
+
+        chatbot_url = f"https://www.facebook.com/messages/t/{target_fanpage_id}"
+        logger.info(f"Navigating to chatbot: {chatbot_url}")
+        driver.get(chatbot_url)
+
+        # Wait for page to load and verify URL
+        WebDriverWait(driver, 20).until(EC.url_contains(f"facebook.com/messages/t/{target_fanpage_id}"))
+        logger.info("Successfully navigated to chatbot page.")
+        time.sleep(3)
+
+        # 3. Run test cases
+        title = "当 Membaca pertanyaan dan mengirim ke Facebook"
+        modul.show_loading(title)
+        print("\n")
+        count_per_element_title = len(json_data)
+        question_count = sum(sum(1 for key in item if key.startswith("pertanyaan")) for item in json_data)
+        for element in json_data:
+            duration_pertitle = modul.start_time()
+            modul.show_loading(element.get("title", "Untitled"))
+            print("\n")
+            for key, value in element.items():
+                if key.startswith("pertanyaan") and value is not None and str(value).strip() != "":
+                    duration_perquestion = modul.start_time()
+                    question = str(value) # Ensure question is a string
+
+                    if envfacebook.send_message_to_chatbot(driver, question):
+                        time.sleep(2)
+                        respond_bot = envfacebook.get_chatbot_response(driver)
+                    else:
+                        respond_bot = "Error: Gagal mengirim pesan ke chatbot."
+
+                    image_capture = envreport.take_screenshot(driver, id_test, key, question)
+
+                    title_loading = f"{key} : {question}"
+                    modul.show_loading_sampletext(title_loading)
+                    respond_csv = str(element.get("context", "")).strip()
+                    respond_csv = envstatus.respond_csv_correction(respond_csv)
+                    end_duration_persampletext = modul.end_time(duration_perquestion)
+
+                    # Mengaktifkan evaluasi LLM
+                    skor, _, explanation, AI = envllmscore.llm_score(respond_bot, respond_csv)
+
+                    status = envstatus.status(skor)
+                    data_bot = {
+                        "no": element.get("no", ""),
+                        "title": element.get("title", ""),
+                        "question": question,
+                        "response_kb": respond_csv,
+                        "response_llm": respond_bot,
+                        "status": status,
+                        "duration": end_duration_persampletext,
+                        "image_capture": image_capture,
+                        "skor": skor,
+                        "explanation": explanation
+                    }
+                    envfile.write_json_data_bot(data_bot, report_filename, id_test)
+                    pass_count, failed_count = envstatus.calculate(report_filename, id_test)
+                    data_summary = {
+                        "id_test": id_test,
+                        "tester_name": tester_name,
+                        "ai_evaluation": AI,
+                        "url": chatbot_url,
+                        "page_name": "Facebook Test",
+                        "browser_name": "Selenium",
+                        "date_test": today,
+                        "start_time_test": time_start,
+                        "total_title": count_per_element_title,
+                        "total_question": question_count,
+                        "success": pass_count,
+                        "failed": failed_count
+                    }
+                    envfile.write_json_data_summary(data_summary, report_filename, id_test)
+                    envreport.report_action(report_filename, id_test)
+            end_duration_pertitle = modul.end_time(duration_pertitle)
+            chart = {element.get("title", "Untitled"): end_duration_pertitle}
+            envfile.write_json_chart(chart, report_filename, id_test)
+            print(f"\n竢ｳ Total durasi Topik '{element.get('title', 'Untitled')}' : {end_duration_pertitle}\n")
+        print("識 Topik Terakhir \n")
+
+    finally:
+        # Cleanup
+        if driver:
+            try:
+                driver.quit()
+                logger.info("WebDriver closed successfully")
+            except Exception as e:
+                logger.warning(f"Error closing WebDriver: {e}")
+
+        logger.info("Facebook chatbot automation testing finished.")
