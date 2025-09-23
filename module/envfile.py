@@ -10,7 +10,7 @@ def convert_csv_to_json(csv_filename_with_ext, json_file_without_ext):
     """
     Mengonversi file CSV menjadi JSON.
     """
-    csv_path = f'assets/csv/{csv_filename_with_ext}'
+    csv_path = csv_filename_with_ext
     result_path = envfolder.json_converted(json_file_without_ext)
     
     title = f"Converting csv to json from {csv_path}"
@@ -38,7 +38,7 @@ def convert_excel_to_json(excel_filename_with_ext, json_file_without_ext):
     """
     Mengonversi file Excel menjadi JSON.
     """
-    excel_path = f'assets/xlsx/{excel_filename_with_ext}'
+    excel_path = excel_filename_with_ext
     result_path = envfolder.json_converted(json_file_without_ext)
 
     title = f"Converting excel to json from {excel_path}"
