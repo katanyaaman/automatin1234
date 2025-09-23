@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot Test Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .test-case { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+        .status-pass { color: green; font-weight: bold; }
+        .status-fail { color: red; font-weight: bold; }
+        .screenshot { max-width: 100%; height: auto; margin-top: 10px; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <h1>Chatbot Test Report - {{ timestamp }}</h1>
+    
+    <h2>Test Results</h2>
+    {% for result in test_results %}
+        <div class="test-case">
+            <p><strong>Question:</strong> {{ result.question }}</p>
+            <p><strong>Expected Response:</strong> {{ result.expected_response }}</p>
+            <p><strong>Actual Response:</strong> {{ result.actual_response }}</p>
+            <p><strong>Status:</strong> <span class="status-{{ result.status.lower() }}">{{ result.status }}</span></p>
+            {% if result.screenshot %}
+                <p><strong>Screenshot:</strong> <a href="{{ result.screenshot }}" target="_blank">View Screenshot</a></p>
+            {% endif %}
+            {% if result.log %}
+                <p><strong>Log:</strong> {{ result.log }}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <h2>Screenshots</h2>
+    {% for screenshot in screenshots %}
+        <h3>{{ screenshot }}</h3>
+        <img src="{{ screenshots_dir }}/{{ screenshot }}" class="screenshot" alt="{{ screenshot }}">
+    {% endfor %}
+</body>
+</html>
