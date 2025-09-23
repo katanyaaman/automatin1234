@@ -5,3 +5,4 @@
 # Ignore instagrapi session files and folder
 session/
 session.json
+__pycache__/
