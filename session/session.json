@@ -13,9 +13,12 @@
     "ig_www_claim": null,
     "authorization_data": {
         "ds_user_id": "75889220702",
+        "sessionid": "75889220702%3Aaa2kCmaUHnQ6He%3A21%3AAYe9aCo3cQEfVZSq2ImUqQxROEuMvmpKWWmWwTB_WA",
+        "should_use_header_over_cookies": true
+    },
+    "cookies": {
         "sessionid": "75889220702%3Aaa2kCmaUHnQ6He%3A21%3AAYe9aCo3cQEfVZSq2ImUqQxROEuMvmpKWWmWwTB_WA"
     },
-    "cookies": {},
     "last_login": 1756432072.5485365,
     "device_settings": {
         "app_version": "269.0.0.18.75",
