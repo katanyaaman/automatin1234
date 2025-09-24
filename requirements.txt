@@ -22,4 +22,4 @@ uuid>=1.30
 
 # Optional: For enhanced features
 # pillow>=10.0.0  # For image processing if needed
-# requests>=2.31.0  # For HTTP requests if needed
+requests>=2.31.0  # For HTTP requests if needed
