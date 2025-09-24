@@ -293,27 +293,55 @@ def get_chatbot_response(driver: webdriver.Chrome) -> Optional[str]:
             "//div[@data-hover='tooltip']/div/span"
         ]
 
-        responses = []
-        for selector in response_selectors:
-            try:
-                elements = WebDriverWait(driver, 15).until(
-                    EC.presence_of_all_elements_located((By.XPATH, selector))
-                )
-                for elem in elements:
-                    text = elem.text.strip()
-                    if text:
-                        responses.append(text)
-            except TimeoutException:
-                continue
+        # responses = []
+        # for selector in response_selectors:
+        #     try:
+        #         elements = WebDriverWait(driver, 15).until(
+        #             EC.presence_of_all_elements_located((By.XPATH, selector))
+        #         )
+        #         for elem in elements:
+        #             text = elem.text.strip()
+        #             if text:
+        #                 responses.append(text)
+        #     except TimeoutException:
+        #         continue
 
-        if responses:
-            latest_response = responses[-1]
-            logger.info(f"Found response: {latest_response[:50]}...")
-            return latest_response
-        else:
-            logger.warning("No chatbot response found")
+    
+        # return latest_response.text.strip()
+
+
+        # if responses:
+        #     latest_response = responses[-1]
+        #     logger.info(f"Found response: {latest_response[:50]}...")
+        #     return latest_response
+        # else:
+        #     logger.warning("No chatbot response found")
+        #     return None
+        
+        xpath_bot = "//div[contains(@class,'html-div') and contains(@class,'x18lvrbx')]"
+
+        # hitung jumlah bubble bot sebelum kirim pertanyaan
+        old_count = len(driver.find_elements(By.XPATH, xpath_bot))
+
+        try:
+            # tunggu sampai jumlah bubble bot nambah (ada jawaban baru)
+            WebDriverWait(driver, 15).until(
+                lambda d: len(d.find_elements(By.XPATH, xpath_bot)) > old_count
+            )
+
+            # ambil semua bubble bot setelah old_count
+            elems = driver.find_elements(By.XPATH, xpath_bot)
+            new_elems = elems[old_count:]  # semua bubble baru
+
+            # gabungkan teks jadi satu string
+            responses = [e.text.strip() for e in new_elems if e.text.strip()]
+            full_response = " ".join(responses)
+
+            print("Full response:", full_response)  # print sebagian untuk verifikasi
+            return full_response if full_response else None
+
+        except TimeoutException:
             return None
-
     except Exception as e:
         logger.error(f"Error getting chatbot response: {e}")
         return None

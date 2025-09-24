@@ -5,7 +5,6 @@ import time
 import os
 
 api_key_openruter = os.getenv("API_KEY_OPENROUTER")
-api_key_gemini = os.getenv("API_KEY_GEMINI")
 
 def prompt_evaluator():
     PROMPT_TEMPLATE = """
@@ -91,6 +90,8 @@ def hit_llm_to_scoring(response_bot, respond_text):
     return score, output, explanation, AI
 
 def hit_llm_to_scoring_gemini(response_bot, respond_text):
+    api_key_gemini = os.getenv("API_KEY_GEMINI")
+
     # response_bot = "Jenis asuransi ini memberikan perlindungan finansial terhadap risiko kehidupan dan kematian pemegang polis. Karakteristik utama asuransi jiwa adalah pemberian manfaat berupa uang pertanggungan kepada ahli waris jika pemegang polis berpulang. Apabila pemegang polis masih hidup dalam jangka waktu yang ditentukan, mereka akan mendapatkan manfaat dalam bentuk nilai tunai.Manfaat dan perlindungan yang diberikan asuransi jiwa berupa uang pertanggungan yang bisa digunakan untuk memenuhi kebutuhan sehari-hari.	"
     # respond_text = "Asuransi jiwa adalah jenis asuransi yang memberikan perlindungan finansial terhadap risiko kehidupan dan kematian pemegang polis.Jika pemegang polis berpulang, ahli waris akan menerima uang pertanggungan.Kalau pemegang polis masih hidup dalam jangka waktu yang ditentukan, mereka bisa mendapatkan manfaat dalam bentuk nilai tunai.Jadi, asuransi jiwa membantu memenuhi kebutuhan sehari-hari keluarga yang ditinggalkan. Ada lagi yang ingin Anda tahu?	"
 
