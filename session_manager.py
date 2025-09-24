@@ -25,6 +25,15 @@ def save_session_cookies(folder_path: str, cookies: List[Dict[str, Any]]) -> Non
 def load_session_cookies(folder_path: str) -> Optional[List[Dict[str, Any]]]:
     """Load cookies from session folder."""
     try:
+        # First try sessionfb.json if we're in the session folder
+        sessionfb_path = os.path.join(folder_path, 'sessionfb.json')
+        if os.path.exists(sessionfb_path):
+            with open(sessionfb_path, 'r') as f:
+                cookies = json.load(f)
+                logging.info(f"Session cookies loaded from {sessionfb_path}")
+                return cookies
+        
+        # Fallback to cookies.json
         json_path = os.path.join(folder_path, 'cookies.json')
         if os.path.exists(json_path):
             with open(json_path, 'r') as f:
@@ -38,11 +47,25 @@ def load_session_cookies(folder_path: str) -> Optional[List[Dict[str, Any]]]:
 def find_available_sessions() -> List[Tuple[str, str]]:
     """Find all available session folders with valid cookies."""
     available_sessions = []
-    sessions_dir = 'sessions'
+    sessions_dir = 'session'  # Changed from 'sessions' to 'session'
     
     if not os.path.exists(sessions_dir):
         return available_sessions
     
+    # Check for sessionfb.json file directly
+    sessionfb_path = os.path.join(sessions_dir, 'sessionfb.json')
+    if os.path.exists(sessionfb_path):
+        try:
+            # Validate cookies file
+            with open(sessionfb_path, 'r') as f:
+                cookies = json.load(f)
+                if cookies and isinstance(cookies, list) and len(cookies) > 0:
+                    available_sessions.append(('sessionfb', sessions_dir))
+                    logging.info(f"Found valid Facebook session: sessionfb.json")
+        except (json.JSONDecodeError, IOError):
+            logging.warning(f"Invalid Facebook session found: sessionfb.json")
+    
+    # Also check for traditional session folders
     for session_id in os.listdir(sessions_dir):
         session_path = os.path.join(sessions_dir, session_id)
         cookies_path = os.path.join(session_path, 'cookies.json')
@@ -95,6 +118,14 @@ def validate_session_cookies(cookie_file_path: str) -> bool:
         True if cookies are valid, False otherwise
     """
     try:
+        # If cookie_file_path is a directory, check for sessionfb.json first
+        if os.path.isdir(cookie_file_path):
+            sessionfb_path = os.path.join(cookie_file_path, 'sessionfb.json')
+            if os.path.exists(sessionfb_path):
+                cookie_file_path = sessionfb_path
+            else:
+                cookie_file_path = os.path.join(cookie_file_path, 'cookies.json')
+        
         if not os.path.exists(cookie_file_path):
             logging.warning(f"Cookie file does not exist: {cookie_file_path}")
             return False

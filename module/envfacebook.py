@@ -32,12 +32,11 @@ def perform_manual_login() -> Tuple[str, str]:
     existing_session = get_latest_session()
 
     if existing_session:
-        session_path, session_id = existing_session
+        session_id, session_path = existing_session
         logging.info(f"Found existing session: {session_id}")
 
-        # Validate the session cookies
-        cookie_file = os.path.join(session_path, 'cookies.json')
-        if os.path.exists(cookie_file) and validate_session_cookies(cookie_file):
+        # Validate the session cookies (pass the directory path, function will handle sessionfb.json)
+        if validate_session_cookies(session_path):
             logging.info("Existing session is valid, reusing it")
             return session_path, session_id
         else:
@@ -144,8 +143,7 @@ def initialize_driver(session_folder_path: str) -> webdriver.Chrome:
         logger.info("WebDriver initialized successfully")
 
         # Load and validate session cookies
-        cookie_file = os.path.join(session_folder_path, 'cookies.json')
-        if validate_session_cookies(cookie_file):
+        if validate_session_cookies(session_folder_path):
             cookies = load_session_cookies(session_folder_path)
             logger.info("Loading session cookies...")
             driver.get("https://www.facebook.com/")
