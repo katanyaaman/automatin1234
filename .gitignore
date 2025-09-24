@@ -3,9 +3,11 @@
 # kakiwuaka.json # Ganti dengan username Instagram Anda yang sebenarnya
 
 # Ignore instagrapi session files and folder
-session/
-session.json
+# session/
+# session.json
 __pycache__/
 
 # Ignore environment files
 # .env
+.venv
+.vscode
