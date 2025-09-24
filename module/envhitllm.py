@@ -100,8 +100,7 @@ def hit_llm_to_scoring_gemini(response_bot, respond_text):
         actual_output=response_bot
     )
     
-    # url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=" + api_key_gemini
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=AIzaSyB_kYDKaUbfr1T6VXsaraI-CkS2Go5gV14"
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=" + api_key_gemini
     headers = {
         "Content-Type": "application/json"
     }

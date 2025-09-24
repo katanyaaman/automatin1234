@@ -1,6 +1,7 @@
 import os
 import glob
 import asyncio # Diperlukan untuk menjalankan fungsi async
+from dotenv import load_dotenv
 from module import modul, envfile, envwebchat, action, envreport, envfolder
 # Jangan import envinstagram di sini secara langsung, kita akan import secara kondisional
 
@@ -23,6 +24,9 @@ def cleanup_previous_report(report_filename, id_test):
     print("\n")
 
 def main():
+    # Muat variabel dari file .env di awal eksekusi
+    load_dotenv()
+
     modul.initialize("Initialize ...")
     today, time_start = modul.todays()
     start_duration_measurement = modul.start_time()

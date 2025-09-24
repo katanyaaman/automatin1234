@@ -6,3 +6,6 @@
 session/
 session.json
 __pycache__/
+
+# Ignore environment files
+.env
