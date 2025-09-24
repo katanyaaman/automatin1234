@@ -136,7 +136,7 @@ def initialize_driver(session_folder_path: str) -> webdriver.Chrome:
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
 
     try:
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
